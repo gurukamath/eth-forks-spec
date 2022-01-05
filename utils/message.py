@@ -1,6 +1,6 @@
 """
-Frontier Utility Functions For The Message Data-structure
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Homestead Utility Functions For The Message Data-structure
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. contents:: Table of Contents
     :backlinks: none
@@ -9,7 +9,7 @@ Frontier Utility Functions For The Message Data-structure
 Introduction
 ------------
 
-Message specific functions used in this frontier version of specification.
+Message specific functions used in this homestead version of specification.
 """
 from typing import Optional, Union
 
@@ -29,6 +29,7 @@ def prepare_message(
     gas: U256,
     env: Environment,
     code_address: Optional[Address] = None,
+    should_transfer_value: bool = True,
 ) -> Message:
     """
     Execute a transaction against the provided environment.
@@ -51,10 +52,12 @@ def prepare_message(
         This is usually same as the `target` address except when an alternative
         accounts code needs to be executed.
         eg. `CALLCODE` calling a precompile.
+    should_transfer_value :
+        if True ETH should be transferred while executing a message call.
 
     Returns
     -------
-    message: `ethereum.frontier.vm.Message`
+    message: `ethereum.homestead.vm.Message`
         Items containing contract creation or message call specific data.
     """
     if isinstance(target, Bytes0):
@@ -83,4 +86,5 @@ def prepare_message(
         depth=Uint(0),
         current_target=current_target,
         code_address=code_address,
+        should_transfer_value=should_transfer_value,
     )

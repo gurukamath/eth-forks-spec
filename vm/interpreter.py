@@ -107,9 +107,12 @@ def process_create_message(message: Message, env: Environment) -> Evm:
 
     Returns
     -------
-    evm: `ethereum.frontier.vm.Evm`
+    evm: `ethereum.homestead.vm.Evm`
         Items containing execution specific objects.
     """
+    # take snapshot of state before processing the message
+    begin_transaction(env.state)
+
     evm = process_message(message, env)
     if not evm.has_erred:
         contract_code = evm.output
@@ -117,9 +120,17 @@ def process_create_message(message: Message, env: Environment) -> Evm:
         try:
             evm.gas_left = subtract_gas(evm.gas_left, contract_code_gas)
         except OutOfGasError:
-            evm.output = b""
+            rollback_transaction(env.state)
+            evm.gas_left = U256(0)
+            evm.logs = ()
+            evm.accounts_to_delete = set()
+            evm.refund_counter = U256(0)
+            evm.has_erred = True
         else:
             set_code(env.state, message.current_target, contract_code)
+            commit_transaction(env.state)
+    else:
+        rollback_transaction(env.state)
     return evm
 
 
@@ -136,7 +147,7 @@ def process_message(message: Message, env: Environment) -> Evm:
 
     Returns
     -------
-    evm: `ethereum.frontier.vm.Evm`
+    evm: `ethereum.homestead.vm.Evm`
         Items containing execution specific objects
     """
     if message.depth > STACK_DEPTH_LIMIT:
@@ -149,7 +160,7 @@ def process_message(message: Message, env: Environment) -> Evm:
 
     sender_balance = get_account(env.state, message.caller).balance
 
-    if message.value != 0:
+    if message.should_transfer_value and message.value != 0:
         if sender_balance < message.value:
             rollback_transaction(env.state)
             raise InsufficientFunds(

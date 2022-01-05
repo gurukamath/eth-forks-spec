@@ -1,6 +1,6 @@
 """
-Frontier Utilities Json
-^^^^^^^^^^^^^^^^^^^^^^^
+Homestead Utilities Json
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. contents:: Table of Contents
     :backlinks: none
@@ -9,7 +9,7 @@ Frontier Utilities Json
 Introduction
 ------------
 
-Json specific utilities used in this frontier version of specification.
+Json specific utilities used in this homestead version of specification.
 """
 from typing import Any, Dict, Tuple
 

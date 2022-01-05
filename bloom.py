@@ -9,11 +9,7 @@ Ethereum Logs Bloom
 Introduction
 ------------
 
-This modules defines functions for calculating bloom filters of logs. For the
-general theory of bloom filters see e.g. `Wikipedia
-<https://en.wikipedia.org/wiki/Bloom_filter>`_. Bloom filters are used to allow
-for efficient searching of logs by address and/or topic, by rapidly
-eliminating blocks and reciepts from their search.
+Logs Bloom related functionalities used in Ethereum.
 """
 
 from typing import Tuple
@@ -28,10 +24,6 @@ def add_to_bloom(bloom: bytearray, bloom_entry: bytes) -> None:
     """
     Add a bloom entry to the bloom filter (`bloom`).
 
-    The number of hash functions used is 3. They are calculated by taking the
-    least significant 11 bits from the first 3 16-bit words of the
-    `keccak_256()` hash of `bloom_entry`.
-
     Parameters
     ----------
     bloom :
@@ -39,6 +31,7 @@ def add_to_bloom(bloom: bytearray, bloom_entry: bytes) -> None:
     bloom_entry :
         An entry which is to be added to bloom filter.
     """
+    # TODO: This functionality hasn't been tested rigorously yet.
     hash = keccak256(bloom_entry)
 
     for idx in (0, 2, 4):
@@ -58,21 +51,21 @@ def add_to_bloom(bloom: bytearray, bloom_entry: bytes) -> None:
 
 def logs_bloom(logs: Tuple[Log, ...]) -> Bloom:
     """
-    Calculate the Bloom filter for a set of logs.
-
-    The address and each topic of a log are added to the bloom filter.
+    Obtain the logs bloom from a list of log entries.
 
     Parameters
     ----------
     logs :
-        List of logs for which the logs bloom is to be calculated.
+        List of logs for which the logs bloom is to be obtained.
 
     Returns
     -------
     logs_bloom : `Bloom`
-        The logs bloom calculated which is 256 bytes with some bits set as per
+        The logs bloom obtained which is 256 bytes with some bits set as per
         the caller address and the log topics.
     """
+    # TODO: Logs bloom functionality hasn't been tested rigorously yet. The
+    # required test cases need `CALL` opcode to be implemented.
     bloom: bytearray = bytearray(b"\x00" * 256)
 
     for log in logs:
